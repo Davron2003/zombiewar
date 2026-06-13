@@ -151,17 +151,49 @@
         </div>
     </div>
 
-    <!-- AD LOADING SCREEN -->
-    <div id="ad-loading-screen" class="absolute inset-0 z-40 bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center p-6 hidden">
-        <div class="max-w-md w-full text-center flex flex-col items-center">
-            <div class="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-            <span class="text-xs text-cyan-400 font-bold bg-cyan-950/60 border border-cyan-800/40 rounded-full px-4 py-1.5 tracking-widest uppercase mb-3 animate-pulse">
-                Homiylik Reklamasi 🎬
-            </span>
-            <h2 class="text-2xl font-extrabold text-white mb-2">Reklama yuklanmoqda...</h2>
-            <p class="text-slate-400 text-sm max-w-sm text-center">
-                Iltimos kuting, o'yinni davom ettirish uchun homiylik reklamasi yuklanmoqda...
+    <!-- ADSGRAM REKLAMA PLAYING PANEL (MUTLAQO MAJBURIY REKLAMA TIZIMI) -->
+    <div id="ad-loading-screen" class="absolute inset-0 z-45 bg-[#08080c]/98 backdrop-blur-xl flex flex-col justify-center items-center p-6 hidden">
+        <div class="max-w-lg w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+            <!-- Animated progressive top border tracker for total immersion -->
+            <div id="ad-progress-bar" class="absolute top-0 left-0 h-[4px] bg-cyan-500 transition-all duration-1000" style="width: 100%"></div>
+
+            <div class="flex items-center justify-between w-full mb-6 border-b border-slate-800/60 pb-4">
+                <span class="flex items-center gap-1.5 px-3 py-1 bg-cyan-950/90 text-cyan-400 border border-cyan-800/60 text-[10px] font-black rounded-lg tracking-widest uppercase">
+                    🎬 HOMIYLIK REKLAMASI
+                </span>
+                <span class="text-[10px] text-slate-500 font-mono font-bold tracking-wider">
+                    ID: int-35055 (Adsgram)
+                </span>
+            </div>
+
+            <!-- Ad Gameplay / Visual Simulation Content -->
+            <div class="w-full h-44 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col justify-end items-center p-4 relative overflow-hidden mb-6" style="background-image: linear-gradient(to bottom, rgba(5,5,8,0.2), rgba(5,5,8,0.9)), url('https://i.ibb.co/Y7YsfZBx/1781339467533.png'); background-size: cover; background-position: center;">
+                <div class="absolute inset-0 bg-cyan-500/10 pointer-events-none"></div>
+                
+                <!-- Rotating or spinning biohazard marker inside ad simulation -->
+                <div class="w-12 h-12 bg-rose-500/20 border border-rose-500/40 rounded-full flex items-center justify-center mb-2 animate-spin">
+                    <span class="text-xl">⚠️</span>
+                </div>
+                
+                <h4 class="text-sm font-black text-white uppercase tracking-wider">ZOMBIE APOCALYPSE: SURVIVAL</h4>
+                <p class="text-[10px] text-zinc-400 font-semibold mb-2">Bizning yangi multiplayer o'yinimizga hoziroq qo'shiling!</p>
+            </div>
+
+            <!-- Real-time countdown clock in Uzbek language -->
+            <h2 id="ad-title" class="text-2xl font-black text-white mb-2 tracking-tight">Kuting, reklama namoyish etilmoqda...</h2>
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-ping"></div>
+                <p id="ad-description" class="text-cyan-400 font-extrabold text-lg font-mono">Reklama tugashiga: 15 soniya</p>
+            </div>
+
+            <p class="text-slate-400 text-xs max-w-sm mb-6 leading-relaxed">
+                Homiylik reklamasi loyihani doimiy bepul, yangi xaritalar va askar turlari bilan rivojlantirishga xizmat qiladi. Reklama yakunlandan so'ng sizga +10 kristall bonus taqdim etiladi!
             </p>
+
+            <!-- Mock active installation CTA to make it feel extremely gamified -->
+            <a href="https://adsgram.ai" target="_blank" class="w-full py-3.5 px-6 bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 active:scale-95 duration-150 rounded-2xl text-xs font-black text-white shadow-xl shadow-cyan-600/20 flex items-center justify-center gap-2 uppercase tracking-widest">
+                🔥 TEZDA LABLAB OLMASHISH / PLAY NOW
+            </a>
         </div>
     </div>
 
@@ -775,12 +807,70 @@
 
             // Adsgram reklamani ko'rsatish boshlanishi
             const adLoadingScreen = document.getElementById("ad-loading-screen");
-            adLoadingScreen.classList.remove("hidden");
+            const adTitle = document.getElementById("ad-title");
+            const adDescription = document.getElementById("ad-description");
+            const adProgressBar = document.getElementById("ad-progress-bar");
+
+            // Element defaultlarni tiklash
+            if (adLoadingScreen) adLoadingScreen.classList.remove("hidden");
+            if (adTitle) adTitle.innerText = "Kuting, reklama namoyish etilmoqda...";
+            if (adDescription) {
+                adDescription.innerText = "Sponsor: Adsgram | Reklama yuklanmoqda...";
+                adDescription.className = "text-cyan-400 font-extrabold text-lg font-mono";
+            }
+            if (adProgressBar) {
+                adProgressBar.style.width = "100%";
+                adProgressBar.style.backgroundColor = "#06b6d4"; // cyan
+            }
 
             const blockId = "int-35055";
-            function showGameOverScreen() {
-                adLoadingScreen.classList.add("hidden");
-                document.getElementById("gameover-screen").classList.remove("hidden");
+
+            // Reklama tugagandan so'ng o'yin tugallanishi va bonus berilishi
+            function finishAdWatch() {
+                // Kristallarga bonus qo'shish
+                coinsCollected += 10;
+                document.getElementById("coins-val").innerText = "💎 " + coinsCollected;
+
+                // Muvaffaqiyatli xabar
+                if (adTitle) adTitle.innerText = "Reklama muvaffaqiyatli tomosha qilindi! 🎉";
+                if (adDescription) {
+                    adDescription.innerText = "YUTUQ: +10 Kristall taqdim etildi!";
+                    adDescription.className = "text-emerald-400 font-extrabold text-lg font-mono animate-bounce";
+                }
+                if (adProgressBar) {
+                    adProgressBar.style.width = "100%";
+                    adProgressBar.style.backgroundColor = "#10b981"; // emerald green
+                }
+
+                soundFX.playCoin(); // Play visual/audio reward
+                createExplosionEffect(0x10b981, new THREE.Vector3(0, 2, playerGroup.position.z));
+
+                setTimeout(() => {
+                    if (adLoadingScreen) adLoadingScreen.classList.add("hidden");
+                    document.getElementById("gameover-screen").classList.remove("hidden");
+                }, 1800);
+            }
+
+            // Majburiy orqa-fon sanagichini ishga tushirish (agar Adsgram ochilmasa yoki brauzerda sinov qilishsa)
+            function startFallbackSimulation() {
+                console.log("Adsgram fallback simulation started.");
+                let timeLeft = 15;
+                if (adProgressBar) adProgressBar.style.width = "100%";
+
+                const adInterval = setInterval(() => {
+                    timeLeft--;
+                    if (adDescription) {
+                        adDescription.innerText = "Reklama tugashiga: " + timeLeft + " soniya";
+                    }
+                    if (adProgressBar) {
+                        adProgressBar.style.width = (timeLeft / 15 * 100) + "%";
+                    }
+
+                    if (timeLeft <= 0) {
+                        clearInterval(adInterval);
+                        finishAdWatch();
+                    }
+                }, 1000);
             }
 
             if (window.Adsgram) {
@@ -788,21 +878,21 @@
                     const AdController = window.Adsgram.init({ blockId: blockId });
                     AdController.show()
                         .then((result) => {
-                            console.log("Adsgram watched successfully:", result);
-                            showGameOverScreen();
+                            console.log("Adsgram video resolved successfully:", result);
+                            finishAdWatch();
                         })
                         .catch((err) => {
-                            console.warn("Adsgram skipped or failed:", err);
-                            showGameOverScreen();
+                            console.warn("Adsgram video failed or was closed early. Enforcing interactive countdown restriction...");
+                            // If user is playing and skips/blocks, force them to watch a simulated ad to guarantee the reward/restart sequence is never bypassed
+                            startFallbackSimulation();
                         });
                 } catch (err) {
-                    console.error("Adsgram exception:", err);
-                    showGameOverScreen();
+                    console.error("Adsgram init error. running fallback timer.", err);
+                    startFallbackSimulation();
                 }
             } else {
-                console.warn("Adsgram window object not ready.");
-                // Simulating realistic responsive delay of ad load transition
-                setTimeout(showGameOverScreen, 1200);
+                console.warn("Adsgram SDK is not present in this context. Emulating custom immersive ad layout.");
+                startFallbackSimulation();
             }
         }
 
