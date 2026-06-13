@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Zombie Runner</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background-color: #050508; 
+            font-family: 'Inter', sans-serif; 
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+        .hud-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        /* Custom scrollbar just in case */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <!-- Three.js va uning qo'shimcha motorlari -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js"></script>
+</head>
+<body class="relative w-screen h-screen overflow-hidden bg-[#050508]">
+
+    <!-- WebGL Canvas joylashuvi -->
+    <div id="game-canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- UI Oynasi -- Chetki ko'rsatgichlar -->
+    <div class="absolute inset-x-0 top-0 z-10 p-4 md:p-6 flex justify-between items-start pointer-events-none">
+        
+        <!-- Masofa va Ball ko'rsatkichi -->
+        <div class="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-2xl p-4 pointer-events-auto flex items-center gap-6 shadow-2xl">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">MASOFA</span>
+                <span id="score-val" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400 hud-font">0 m</span>
+            </div>
+            <div class="h-8 w-[1px] bg-slate-800"></div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">KRISTALLAR</span>
+                <span id="coins-val" class="text-2xl font-black text-amber-400 flex items-center gap-1.5 hud-font">
+                    💎 0
+                </span>
+            </div>
+        </div>
+
+        <!-- Ovoz va Yuqori natija paneli -->
+        <div class="flex items-center gap-3 pointer-events-auto">
+            <div class="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+                <span class="text-amber-400 text-lg">🏆</span>
+                <div class="flex flex-col">
+                    <span class="text-[9px] text-slate-400 font-bold tracking-widest">REKORD</span>
+                    <span id="highscore-val" class="text-sm font-black text-amber-300 hud-font">0 m</span>
+                </div>
+            </div>
+
+            <button id="sound-toggle-btn" class="p-3 bg-slate-950/85 border border-slate-800 hover:bg-slate-900 active:scale-95 rounded-2xl transition duration-155 shadow-lg pointer-events-auto cursor-pointer" title="Ovoz">
+                <span id="sound-icon" class="text-emerald-400 text-xl font-bold">🔊</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- KIRISH / BOSH MENYU -->
+    <div id="menu-screen" class="absolute inset-0 z-30 bg-slate-950/75 backdrop-blur-md flex flex-col justify-center items-center p-6">
+        <div class="max-w-md w-full bg-slate-900/90 border border-slate-800/80 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-cyan-500 via-rose-500 to-yellow-400 animate-pulse"></div>
+
+            <div class="w-16 h-16 bg-rose-950/50 rounded-2xl flex items-center justify-center mb-5 border border-rose-500/30 text-rose-500 shadow-inner">
+                <span class="text-4xl">💀</span>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-amber-400 to-yellow-300 tracking-tight hud-font mb-3">
+                3D ZOMBIE RUNNER
+            </h1>
+            <p class="text-xs text-slate-400 mb-6">
+                Tez yugurar askarni boshqaring va orqadan quvib kelayotgan daxshatli zombidan uzoqroqqa qoching! To'siqlardan sakrab o'ting va kristallarni to'plang.
+            </p>
+
+            <!-- Boshqaruv qo'llanmasi -->
+            <div class="w-full bg-slate-950/90 rounded-2xl border border-slate-800/90 p-4 mb-6 text-left text-xs gap-3 flex flex-col text-slate-300">
+                <div class="flex items-center gap-3">
+                  <span class="px-2 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">A / D</span>
+                  <span class="text-slate-400">oki</span>
+                  <span class="px-2 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">← / →</span>
+                  <p class="leading-tight">Chapga / O'ngga burilish</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-2.5 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">SPACE / W</span>
+                  <p class="leading-tight">To'siqlardan sakrash</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xs">💎</span>
+                  <p class="leading-tight"><span class="text-cyan-300 font-semibold">Bonus:</span> Kristall yig'ib reytingni oshiring.</p>
+                </div>
+            </div>
+
+            <button id="start-game-btn" class="w-full py-4 px-6 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 active:scale-95 duration-150 rounded-2xl text-lg font-black text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-3 cursor-pointer">
+                🎮 O'YINNI BOSHLASH
+            </button>
+        </div>
+    </div>
+
+    <!-- OYIN TUGASH EKRANI (Game Over) -->
+    <div id="gameover-screen" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-lg flex flex-col justify-center items-center p-6 hidden">
+        <div class="max-w-md w-full bg-slate-900 border border-red-950 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-[4px] bg-red-600 animate-pulse"></div>
+
+            <div class="w-20 h-20 bg-red-950/50 rounded-full flex items-center justify-center mb-6 border border-red-500/40 text-red-500">
+                <span class="text-4xl animate-bounce">🧟‍♂️</span>
+            </div>
+
+            <span class="text-xs text-rose-400 font-semibold bg-rose-950/60 border border-rose-800/40 rounded-full px-4 py-1.5 tracking-wider uppercase mb-3">
+                ZOMBI TUTIB OLDI!
+            </span>
+
+            <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                O'yin Tugadi!
+            </h2>
+            <p class="text-slate-400 text-sm mb-6 max-w-xs">
+                Vahshiy zombi sizni quvib etdi! Lekin siz taslim bo'lmang, qaytadan urinib ko'ring.
+            </p>
+
+            <!-- Natijalar ko'rsatgichi -->
+            <div class="grid grid-cols-2 gap-4 w-full mb-8">
+                <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/60">
+                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mb-1">MASOFA</span>
+                    <span id="final-score" class="text-2xl font-black text-rose-400 hud-font">0 m</span>
+                </div>
+                <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/60">
+                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest block mb-1">REKORD</span>
+                    <span id="final-highscore" class="text-2xl font-black text-amber-400 hud-font">0 m</span>
+                </div>
+            </div>
+
+            <button id="restart-game-btn" class="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 active:scale-95 duration-150 rounded-2xl text-lg font-black text-white shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 cursor-pointer">
+                🔄 QAYTADAN BOSHLASH
+            </button>
+        </div>
+    </div>
+
+
+
+    <!-- Yuklanish indikatori -->
+    <div id="loading-overlay" class="absolute inset-0 z-50 flex flex-col justify-center items-center p-6 text-center" style="background-image: linear-gradient(to bottom, rgba(7, 7, 10, 0.75), rgba(7, 7, 10, 0.85)), url('https://i.ibb.co/Y7YsfZBx/1781339467533.png'); background-size: cover; background-position: center;">
+        <div class="max-w-xs w-full">
+            <div class="text-4xl mb-4 animate-bounce">🧟‍♂️</div>
+            <h3 class="text-xl font-bold tracking-tight text-white mb-2">Yuklanmoqda...</h3>
+            <p id="loading-txt" class="text-xs text-slate-500 mb-4 lowercase">3D modellar tayyorlanmoqda...</p>
+            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden p-0.5">
+                <div id="loading-bar" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 15%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API yordamida dinamik ovoz effektlari sintezatori
+        class GameSoundFX {
+            constructor() {
+                this.ctx = null;
+                this.muted = localStorage.getItem("game_muted") === "true";
+                this.updateUI();
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === "suspended") {
+                    this.ctx.resume();
+                }
+            }
+            toggleMute() {
+                this.muted = !this.muted;
+                localStorage.setItem("game_muted", String(this.muted));
+                this.updateUI();
+                return this.muted;
+            }
+            updateUI() {
+                const icon = document.getElementById("sound-icon");
+                if (icon) {
+                    icon.innerText = this.muted ? "🔇" : "🔊";
+                    icon.className = this.muted ? "text-rose-500" : "text-emerald-400";
+                }
+            }
+            playJump() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(450, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+            playCoin() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = "triangle";
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(950, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.22);
+            }
+            playCrash() {
+                if (this.muted) return;
+                this.init();
+                // Noise generation
+                const bufferSize = this.ctx.sampleRate * 0.4;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const src = this.ctx.createBufferSource();
+                src.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = "lowpass";
+                filter.frequency.setValueAtTime(280, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 0.4);
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                src.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                src.start();
+                src.stop(this.ctx.currentTime + 0.4);
+            }
+            playGameOver() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.85);
+                gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.85);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.85);
+            }
+        }
+
+        const soundFX = new GameSoundFX();
+
+        // Dunyo parametrlari va Three.js o'zgaruvchilari
+        let scene, camera, renderer, clock;
+        let playerGroup, zombieGroup;
+        let soldierTemplate = null, zombieTemplate = null;
+        let soldierAnimations = [], zombieAnimations = [];
+        let mixers = [];
+
+        let gameActive = false;
+        let gameSpeed = 0.36;
+        let isJumping = false;
+        let jumpVelocity = 0;
+        let coinsCollected = 0;
+        let distanceCount = 0;
+        let currentLaneX = 0;
+
+        const bridgeWidth = 12;
+        const partLength = 150;
+        const gravityForce = 0.016;
+        const jumpForce = 0.41;
+
+        let bridgeParts = [];
+        let obstacles = [];
+        let coins = [];
+        let particleSystems = [];
+
+        // Hozirgi klaviatura holatini ushlab turish
+        const keys = { ArrowLeft: false, ArrowRight: false, KeyA: false, KeyD: false };
+
+        const soldierModelUrl = "https://raw.githubusercontent.com/Davron2003/spaceshooter/main/1aae90e8-37b6-4cf2-8567-bbd6aaefe554_gltf_run.glb";
+        const zombieModelUrl = "https://raw.githubusercontent.com/Davron2003/spaceshooter/main/zombie.glb";
+
+        // LocalStorage dan yuqori natijani olish
+        let highScore = Number(localStorage.getItem("zombie_runner_highscore") || "0");
+        document.getElementById("highscore-val").innerText = highScore + " m";
+
+        // Yuklanish jarayoni va start funksiyalarini tayyorlash
+        window.addEventListener("DOMContentLoaded", () => {
+            initEngine();
+            setupInteractions();
+        });
+
+        // 1. Zaxira sodda 3D modellar if loading drops
+        function createFallbackSoldier() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.38, 0.38, 1.6, 8),
+                new THREE.MeshStandardMaterial({ color: 0x1b5e20, roughness: 0.6 })
+            );
+            body.position.y = 0.8;
+            const head = new THREE.Mesh(
+                new THREE.SphereGeometry(0.3, 10, 10),
+                new THREE.MeshStandardMaterial({ color: 0xffcc80, roughness: 0.8 })
+            );
+            head.position.y = 1.75;
+            group.add(body, head);
+            return group;
+        }
+
+        function createFallbackZombie() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.4, 0.4, 1.6, 8),
+                new THREE.MeshStandardMaterial({ color: 0x37474f, roughness: 0.9 })
+            );
+            body.position.y = 0.8;
+            const head = new THREE.Mesh(
+                new THREE.SphereGeometry(0.32, 8, 8),
+                new THREE.MeshStandardMaterial({ color: 0x4caf50, roughness: 0.9 })
+            );
+            head.position.y = 1.75;
+            // Cho'zilgan qo'llar
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.8), new THREE.MeshStandardMaterial({ color: 0x4caf50 }));
+            arm.position.set(-0.45, 1.2, 0.4);
+            const armR = arm.clone();
+            armR.position.x = 0.45;
+            group.add(body, head, arm, armR);
+            return group;
+        }
+
+        // 2. Three.js dvijokini yuklash va sozlash
+        async function initEngine() {
+            const container = document.getElementById("game-canvas-container");
+            clock = new THREE.Clock();
+
+            // Sahnani yaratish
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x07070a);
+            scene.fog = new THREE.FogExp2(0x07070a, 0.008);
+
+            // Kamera
+            camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5.8, 11);
+
+            // Renderyor
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Chiroqlar
+            const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+            scene.add(ambient);
+
+            const dirL = new THREE.DirectionalLight(0x00d2ff, 1.5); // Neon mo'ylov
+            dirL.position.set(-15, 30, 15);
+            dirL.castShadow = true;
+            scene.add(dirL);
+
+            const dirR = new THREE.DirectionalLight(0xff005b, 1.0); // Qizil mo'ylov
+            dirR.position.set(15, 25, 15);
+            scene.add(dirR);
+
+            // Yo'lakni dastlabki bo'laklarini yaratish
+            createBridgePart(0);
+            createBridgePart(-partLength);
+
+            // Guruhlarni tashkil etish
+            playerGroup = new THREE.Group();
+            playerGroup.position.set(0, 0, 0);
+            scene.add(playerGroup);
+
+            zombieGroup = new THREE.Group();
+            zombieGroup.position.set(0, 0, 6.2); // Playerdan bir xil 6.2 metr orqada quvib boradi
+            scene.add(zombieGroup);
+
+            // 3D Modellarni yuklash jarayoni
+            const loader = new THREE.GLTFLoader();
+            const loadingBar = document.getElementById("loading-bar");
+            const loadingTxt = document.getElementById("loading-txt");
+
+            // 1. Askar
+            try {
+                loadingTxt.innerText = "Askar modeli o'rnatilmoqda...";
+                loadingBar.style.width = "40%";
+                const gltfS = await loader.loadAsync(soldierModelUrl);
+                soldierTemplate = gltfS.scene;
+                soldierAnimations = gltfS.animations;
+            } catch (err) {
+                console.warn("Askar modelini yuklashda xatolik, zaxira block ishladi:", err);
+            }
+
+            // 2. Zombi (Kiritilgan glb zombi modeli)
+            try {
+                loadingTxt.innerText = "Zombi modeli integratsiya qilinmoqda...";
+                loadingBar.style.width = "80%";
+                const gltfZ = await loader.loadAsync(zombieModelUrl);
+                zombieTemplate = gltfZ.scene;
+                zombieAnimations = gltfZ.animations;
+            } catch (err) {
+                console.warn("Zombi modelini yuklashda xatolik, zaxira block ishladi:", err);
+            }
+
+            loadingBar.style.width = "100%";
+            setTimeout(() => {
+                document.getElementById("loading-overlay").classList.add("hidden");
+                createActors();
+                spawnAllObstacles();
+                // Renderni boshlash
+                animate();
+            }, 500);
+        }
+
+        // Modellarni o'rnatish
+        function createActors() {
+            // Eski asirlarni o'chirish
+            while (playerGroup.children.length > 0) playerGroup.remove(playerGroup.children[0]);
+            while (zombieGroup.children.length > 0) zombieGroup.remove(zombieGroup.children[0]);
+            mixers = [];
+
+            // Player mesh
+            let sMesh;
+            if (soldierTemplate) {
+                sMesh = THREE.SkeletonUtils.clone(soldierTemplate);
+                sMesh.rotation.y = Math.PI / 2; // Oldinga/tugri qarab yuguradi!
+                // O'lchamini normallashtirish
+                const box = new THREE.Box3().setFromObject(sMesh);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                const scale = 1.82 / (size.y || 1);
+                sMesh.scale.set(scale, scale, scale);
+
+                if (soldierAnimations && soldierAnimations.length > 0) {
+                    const mix = new THREE.AnimationMixer(sMesh);
+                    mix.clipAction(soldierAnimations[0]).play();
+                    mixers.push(mix);
+                }
+            } else {
+                sMesh = createFallbackSoldier();
+            }
+            playerGroup.add(sMesh);
+
+            // Zombie mesh
+            let zMesh;
+            if (zombieTemplate) {
+                zMesh = THREE.SkeletonUtils.clone(zombieTemplate);
+                zMesh.rotation.y = Math.PI / 2; // Oldinga tugri qarab quvlaydi!
+                // Zombie nisbatan vahshiyroq & baland boyliroq
+                const box = new THREE.Box3().setFromObject(zMesh);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                const scale = 2.05 / (size.y || 1);
+                zMesh.scale.set(scale, scale, scale);
+
+                if (zombieAnimations && zombieAnimations.length > 0) {
+                    const mix = new THREE.AnimationMixer(zMesh);
+                    // Birinchi run/walk animatsiyasini ishga tushiramiz
+                    mix.clipAction(zombieAnimations[0]).play();
+                    mixers.push(mix);
+                }
+            } else {
+                zMesh = createFallbackZombie();
+            }
+            zombieGroup.add(zMesh);
+        }
+
+        // To'q rangli sci-fi yo'lak yo'lini yaratish
+        function createBridgePart(zPos) {
+            const group = new THREE.Group();
+
+            const roadGeo = new THREE.BoxGeometry(bridgeWidth, 0.4, partLength);
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x0f121d, roughness: 0.85 });
+            const road = new THREE.Mesh(roadGeo, roadMat);
+            road.position.set(0, -0.2, zPos - partLength / 2);
+            road.receiveShadow = true;
+            group.add(road);
+
+            // Neon foni (Cyan va Magenta)
+            const sideGeo = new THREE.BoxGeometry(0.15, 0.42, partLength);
+            const sideMatL = new THREE.MeshBasicMaterial({ color: 0x00f3ff });
+            const sideMatR = new THREE.MeshBasicMaterial({ color: 0xff0066 });
+
+            const borderL = new THREE.Mesh(sideGeo, sideMatL);
+            borderL.position.set(-bridgeWidth / 2 + 0.1, -0.18, zPos - partLength / 2);
+            group.add(borderL);
+
+            const borderR = new THREE.Mesh(sideGeo, sideMatR);
+            borderR.position.set(bridgeWidth / 2 - 0.1, -0.18, zPos - partLength / 2);
+            group.add(borderR);
+
+            scene.add(group);
+            bridgeParts.push(road);
+        }
+
+        // To'siqlar generatori
+        function spawnObstaclesAhead(zPos) {
+            const r = Math.random();
+            const group = new THREE.Group();
+
+            if (r < 0.35) {
+                // 1. Lasorli datchik (sakrab boti'ladi)
+                const poleGeo = new THREE.BoxGeometry(0.35, 1.8, 0.35);
+                const poleMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.9 });
+                const pl = new THREE.Mesh(poleGeo, poleMat);
+                pl.position.set(-bridgeWidth / 2 + 0.5, 0.9, 0);
+                const pr = pl.clone();
+                pr.position.x = bridgeWidth / 2 - 0.5;
+
+                const beamGeo = new THREE.CylinderGeometry(0.08, 0.08, bridgeWidth - 1, 8);
+                const beamMat = new THREE.MeshBasicMaterial({ color: 0xff0052 });
+                const beam = new THREE.Mesh(beamGeo, beamMat);
+                beam.rotation.z = Math.PI / 2;
+                beam.position.set(0, 0.72, 0);
+
+                group.add(pl, pr, beam);
+                group.position.set(0, 0, zPos);
+                group.userData = { type: "laser", height: 1.0, radius: 0.6 };
+            } else if (r < 0.7) {
+                // 2. Katta beton to'siq (yon tomonga olinib qochiladi)
+                const isLeft = Math.random() > 0.5;
+                const width = bridgeWidth / 2 + 1.2;
+                const blockGeo = new THREE.BoxGeometry(width, 2.2, 1.8);
+                const blockMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9 });
+                const block = new THREE.Mesh(blockGeo, blockMat);
+                group.add(block);
+
+                // Belgilar chizig'i
+                for (let i = 0; i < 4; i++) {
+                    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.3, 0.1), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+                    stripe.position.set((-width / 2) + 0.6 + i * 1.0, 0, 0.92);
+                    stripe.rotation.z = -0.4;
+                    group.add(stripe);
+                }
+
+                const xPos = isLeft ? -bridgeWidth / 4 - 0.5 : bridgeWidth / 4 + 0.5;
+                group.position.set(xPos, 1.1, zPos);
+                group.userData = { type: "block", height: 2.2, width: width };
+            } else {
+                // 3. Yonuvchi bochkalar (kichik xavfli)
+                const drumGeom = new THREE.CylinderGeometry(0.6, 0.6, 1.4, 10);
+                const drumMat = new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.4 });
+                const posOffset = Math.random() > 0.5 ? -1.8 : 1.8;
+
+                for (let i = 0; i < 2; i++) {
+                    const d = new THREE.Mesh(drumGeom, drumMat);
+                    d.position.set(posOffset + (i * 1.3), 0.7, 0);
+                    group.add(d);
+                }
+                group.position.set(0, 0, zPos);
+                group.userData = { type: "barrels", height: 1.4, radius: 1.5 };
+            }
+
+            scene.add(group);
+            obstacles.push(group);
+
+            // Kristal / Tangachalarni ustiga tushurish
+            spawnBonusCoins(zPos - 12);
+        }
+
+        // Tangachalar generatori
+        function spawnBonusCoins(zPos) {
+            const coinGroup = new THREE.Group();
+            const crystalGeo = new THREE.OctahedronGeometry(0.38, 0);
+            const crystalMat = new THREE.MeshStandardMaterial({ 
+                color: 0x00f0ff, 
+                emissive: 0x004c80, 
+                roughness: 0.2, 
+                metalness: 0.9 
+            });
+
+            const activeX = (Math.random() - 0.5) * (bridgeWidth - 3);
+            const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+            crystal.position.set(activeX, 1.2, 0);
+            coinGroup.add(crystal);
+
+            coinGroup.position.set(0, 0, zPos);
+            scene.add(coinGroup);
+            coins.push(coinGroup);
+        }
+
+        // Barcha dastlabki to'siqlarni tozalash va tiklash
+        function spawnAllObstacles() {
+            obstacles.forEach(o => scene.remove(o));
+            obstacles = [];
+
+            coins.forEach(c => scene.remove(c));
+            coins = [];
+
+            // Spawn boshlang'ich kordon
+            for (let z = -40; z > -180; z -= 35) {
+                spawnObstaclesAhead(z);
+            }
+        }
+
+        // Portlash mikro zarrachalari generatori (Sparkles)
+        function createExplosionEffect(color, position) {
+            const count = 15;
+            const geom = new THREE.BufferGeometry();
+            const positions = [];
+            const velocities = [];
+
+            for (let i = 0; i < count; i++) {
+                positions.push(position.x, position.y, position.z);
+                velocities.push(new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.35,
+                    Math.random() * 0.2 + 0.1,
+                    (Math.random() - 0.5) * 0.35
+                ));
+            }
+
+            geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({
+                color,
+                size: 0.32,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+
+            const points = new THREE.Points(geom, mat);
+            scene.add(points);
+
+            particleSystems.push({
+                points,
+                life: 1.0,
+                velocity: velocities
+            });
+        }
+
+        // 3. UI, Tugma va Interaktiv bog'lash
+        function setupInteractions() {
+            // O'yinni boshlash tugmasi
+            document.getElementById("start-game-btn").addEventListener("click", () => {
+                document.getElementById("menu-screen").classList.add("hidden");
+                startGame();
+            });
+
+            // Qayta boshlash tugmasi
+            document.getElementById("restart-game-btn").addEventListener("click", () => {
+                document.getElementById("gameover-screen").classList.add("hidden");
+                startGame();
+            });
+
+            // Ovoz sozlagichi
+            document.getElementById("sound-toggle-btn").addEventListener("click", () => {
+                soundFX.toggleMute();
+            });
+
+            // Sensorli datchik (Touch/Drag/Swipe) orqali telefonda boshqarish
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchStartLaneX = 0;
+
+            window.addEventListener("touchstart", (e) => {
+                if (!gameActive) return;
+                const t = e.touches[0];
+                touchStartX = t.clientX;
+                touchStartY = t.clientY;
+                touchStartLaneX = currentLaneX;
+            }, { passive: true });
+
+            window.addEventListener("touchmove", (e) => {
+                if (!gameActive) return;
+                const t = e.touches[0];
+                const deltaX = t.clientX - touchStartX;
+                const deltaY = t.clientY - touchStartY;
+
+                // Chap/O'ng sensor surilishi (Dinamik drag boshqaruv)
+                // Sezgirlik mobil telefonda o'yinchi barmoq harakatiga to'la va silliq bog'lanadi
+                const sensitivity = 0.035;
+                let newLaneX = touchStartLaneX + deltaX * sensitivity;
+                currentLaneX = Math.max(-bridgeWidth / 2 + 1.2, Math.min(bridgeWidth / 2 - 1.2, newLaneX));
+
+                // Sakrash uchun yuqoriga tez surish (Swipe Up)
+                if (deltaY < -40) {
+                    triggerJumpAction();
+                }
+            }, { passive: true });
+
+            // Klaviatura hodisalarini kuzatish
+            window.addEventListener("keydown", (e) => {
+                if (e.code === "ArrowLeft" || e.code === "KeyA") keys.ArrowLeft = true;
+                if (e.code === "ArrowRight" || e.code === "KeyD") keys.ArrowRight = true;
+                if ((e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW")) {
+                    triggerJumpAction();
+                }
+            });
+
+            window.addEventListener("keyup", (e) => {
+                if (e.code === "ArrowLeft" || e.code === "KeyA") keys.ArrowLeft = false;
+                if (e.code === "ArrowRight" || e.code === "KeyD") keys.ArrowRight = false;
+            });
+
+            window.addEventListener("resize", () => {
+                if (!camera || !renderer) return;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function triggerJumpAction() {
+            if (!gameActive || isJumping) return;
+            isJumping = true;
+            jumpVelocity = jumpForce;
+            soundFX.playJump();
+        }
+
+        // O'yin boshlanishi statistikalari
+        function startGame() {
+            gameActive = true;
+            gameSpeed = 0.36;
+            isJumping = false;
+            jumpVelocity = 0;
+            coinsCollected = 0;
+            distanceCount = 0;
+            currentLaneX = 0;
+
+            document.getElementById("coins-val").innerText = "💎 0";
+            document.getElementById("score-val").innerText = "0 m";
+
+            playerGroup.position.set(0, 0, 0);
+            zombieGroup.position.set(0, 0, 6.2); // Zombie har doim ortida yugurishni boshlaydi
+
+            spawnAllObstacles();
+            clock.getDelta(); // reset clock trigger
+        }
+
+        // O'yin tugashi
+        function handleGameOver() {
+            gameActive = false;
+            soundFX.playGameOver();
+
+            document.getElementById("final-score").innerText = distanceCount + " m";
+            if (distanceCount > highScore) {
+                highScore = distanceCount;
+                localStorage.setItem("zombie_runner_highscore", String(highScore));
+                document.getElementById("highscore-val").innerText = highScore + " m";
+            }
+            document.getElementById("final-highscore").innerText = highScore + " m";
+            document.getElementById("gameover-screen").classList.remove("hidden");
+        }
+
+        // --- ASOSIY REFT GAME ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+
+            // Mikserlar ishlashi (Askar va Zombi modeli animatsiyasi)
+            mixers.forEach(m => m.update(delta));
+
+            if (gameActive) {
+                // 1. Klaviatura boshqaruvi (Harbiy chetlanish)
+                if (keys.ArrowLeft) {
+                    currentLaneX = Math.max(-bridgeWidth / 2 + 1.2, currentLaneX - 0.22);
+                }
+                if (keys.ArrowRight) {
+                    currentLaneX = Math.min(bridgeWidth / 2 - 1.2, currentLaneX + 0.22);
+                }
+
+                // Silliq harakat taminlash (Lerping player's track positions)
+                playerGroup.position.x += (currentLaneX - playerGroup.position.x) * 0.25;
+
+                // 2. ZOMBI ASKAR ORTIDAN YUGURISHI LOGIKASI ("zombie mening orqamdan yugirishi kerak")
+                // Zombi chap yo o'ngga burilishini askarga moslashtirib silliq (lerp) tarzda quvib boradi
+                zombieGroup.position.x += (playerGroup.position.x - zombieGroup.position.x) * 0.12;
+
+                // Dinamik silkinib/qushilib borgan daxshatli nafas/quvlash masofasi
+                const dynamicChaseOffset = 6.2 + Math.sin(Date.now() * 0.005) * 0.35;
+                const targetZombieZ = playerGroup.position.z + dynamicChaseOffset;
+                zombieGroup.position.z += (targetZombieZ - zombieGroup.position.z) * 0.15;
+
+                // Zombi ham sakrash holatiga tushishi yoki bitta yugurish tekisligida qolishi
+                if (isJumping) {
+                    zombieGroup.position.y += (playerGroup.position.y * 0.45 - zombieGroup.position.y) * 0.2;
+                } else {
+                    zombieGroup.position.y += (0 - zombieGroup.position.y) * 0.25;
+                }
+
+                // Zombi askar tomonga qarab biroz qiyshayib burilishi
+                const angle = (playerGroup.position.x - zombieGroup.position.x) * 0.3;
+                zombieGroup.rotation.y = angle;
+
+                // 3. Sakrash fizikasi
+                if (isJumping) {
+                    playerGroup.position.y += jumpVelocity;
+                    jumpVelocity -= gravityForce;
+                    if (playerGroup.position.y <= 0) {
+                        playerGroup.position.y = 0;
+                        isJumping = false;
+                        jumpVelocity = 0;
+                    }
+                }
+
+                // Oldinga qarab tinimsiz yugurish
+                playerGroup.position.z -= gameSpeed;
+                gameSpeed += 0.000028; // Yo'lakda tezlik ortib borish effekti
+
+                // Masofani yangilash
+                distanceCount = Math.floor(Math.abs(playerGroup.position.z));
+                document.getElementById("score-val").innerText = distanceCount + " m";
+
+                // Kamera silliq askar va zombining orqasida joylashishi (ikkalasi ham chiroyli ko'rinadi)
+                camera.position.z = playerGroup.position.z + 14.8; // Orqaroqqa surildi
+                camera.position.y = 8.0; // Yuqoriroqdan qarash
+                camera.position.x = playerGroup.position.x * 0.7;
+                // Ikkala qahramonning markaz-oldingi nuqtasini qamrab oladi
+                camera.lookAt(playerGroup.position.x * 0.45, 1.5, playerGroup.position.z - 4.5);
+
+                // 4. Cheksiz koinot yangi yo'llarni generatori
+                bridgeParts.forEach(part => {
+                    if (playerGroup.position.z < part.position.z - partLength / 2) {
+                        part.position.z -= partLength * 2;
+                        // Yangi segmentlar ustida to'siqlar qo'zg'alishi
+                        spawnObstaclesAhead(part.position.z - 20);
+                        spawnObstaclesAhead(part.position.z - 60);
+                    }
+                });
+
+                // 5. To'qnashuvlarni tekshirish (Player Bounding Box)
+                const pPos = playerGroup.position;
+                const pBox = new THREE.Box3(
+                    new THREE.Vector3(pPos.x - 0.45, pPos.y, pPos.z - 0.5),
+                    new THREE.Vector3(pPos.x + 0.45, pPos.y + 1.8, pPos.z + 0.5)
+                );
+
+                // To'siqlar bilan urilish
+                obstacles.forEach((obs, index) => {
+                    const obsBox = new THREE.Box3().setFromObject(obs);
+
+                    if (pBox.intersectsBox(obsBox)) {
+                        // Crash portlash effekti
+                        soundFX.playCrash();
+                        createExplosionEffect(0xff0066, pPos);
+                        createExplosionEffect(0x00f3ff, pPos);
+
+                        // Zombi tashlanishi!
+                        zombieGroup.position.z = pPos.z + 1.2;
+
+                        // Bir necha soniyadan so'ng o'yin yakunlanadi
+                        setTimeout(() => {
+                            handleGameOver();
+                        }, 500);
+                    }
+
+                    // Orqada qolib ketgan to'siqlarni o'chirish
+                    if (obs.position.z > playerGroup.position.z + 18) {
+                        scene.remove(obs);
+                        obstacles.splice(index, 1);
+                    }
+                });
+
+                // Kristall bonuslarni yeg'ish
+                coins.forEach((cGroup, outerIndex) => {
+                    cGroup.children.forEach((crystal, innerIndex) => {
+                        crystal.rotation.y += 0.05;
+                        crystal.rotation.x += 0.01;
+
+                        const cPos = new THREE.Vector3();
+                        crystal.getWorldPosition(cPos);
+
+                        if (pPos.distanceTo(cPos) < 1.4) {
+                            soundFX.playCoin();
+                            createExplosionEffect(0x00f0ff, cPos);
+
+                            coinsCollected++;
+                            document.getElementById("coins-val").innerText = "💎 " + coinsCollected;
+
+                            // O'chirib tashlash
+                            cGroup.remove(crystal);
+                        }
+                    });
+
+                    if (cGroup.position.z > playerGroup.position.z + 18) {
+                        scene.remove(cGroup);
+                        coins.splice(outerIndex, 1);
+                    }
+                });
+            }
+
+            // Zarrachalar harakati (Sparkles)
+            particleSystems.forEach((sys, index) => {
+                sys.life -= delta * 1.5;
+                const positions = sys.points.geometry.attributes.position.array;
+
+                for (let i = 0; i < sys.velocity.length; i++) {
+                    const v = sys.velocity[i];
+                    positions[i * 3] += v.x;
+                    positions[i * 3 + 1] += v.y;
+                    positions[i * 3 + 2] += v.z;
+                    v.y -= 0.005; // gravity pull
+                }
+
+                sys.points.geometry.attributes.position.needsUpdate = true;
+
+                if (sys.life <= 0) {
+                    scene.remove(sys.points);
+                    particleSystems.splice(index, 1);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
