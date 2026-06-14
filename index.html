@@ -74,42 +74,108 @@
     </div>
 
     <!-- KIRISH / BOSH MENYU -->
-    <div id="menu-screen" class="absolute inset-0 z-30 bg-slate-950/75 backdrop-blur-md flex flex-col justify-center items-center p-6">
-        <div class="max-w-md w-full bg-slate-900/90 border border-slate-800/80 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+    <div id="menu-screen" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col justify-center items-center p-4 overflow-y-auto">
+        <div class="max-w-md w-full bg-slate-900/95 border border-slate-800/80 p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-cyan-500 via-rose-500 to-yellow-400 animate-pulse"></div>
 
-            <div class="w-16 h-16 bg-rose-950/50 rounded-2xl flex items-center justify-center mb-5 border border-rose-500/30 text-rose-500 shadow-inner">
-                <span class="text-4xl">💀</span>
+            <div class="w-14 h-14 bg-rose-950/50 rounded-2xl flex items-center justify-center mb-3 border border-rose-500/30 text-rose-500 shadow-inner">
+                <span class="text-3xl">💀</span>
             </div>
 
-            <h1 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-amber-400 to-yellow-300 tracking-tight hud-font mb-3">
+            <h1 class="text-2xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-amber-400 to-yellow-300 tracking-tight hud-font mb-2">
                 3D ZOMBIE RUNNER
             </h1>
-            <p class="text-xs text-slate-400 mb-6">
-                Tez yugurar askarni boshqaring va orqadan quvib kelayotgan daxshatli zombidan uzoqroqqa qoching! To'siqlardan sakrab o'ting va kristallarni to'plang.
-            </p>
 
-            <!-- Boshqaruv qo'llanmasi -->
-            <div class="w-full bg-slate-950/90 rounded-2xl border border-slate-800/90 p-4 mb-6 text-left text-xs gap-3 flex flex-col text-slate-300">
-                <div class="flex items-center gap-3">
-                  <span class="px-2 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">A / D</span>
-                  <span class="text-slate-400">oki</span>
-                  <span class="px-2 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">← / →</span>
-                  <p class="leading-tight">Chapga / O'ngga burilish</p>
+            <!-- Telegram Profil va Kristall Balansi -->
+            <div class="w-full bg-slate-950/90 rounded-2xl border border-slate-800/80 p-3.5 mb-3 flex justify-between items-center text-left">
+                <div class="flex flex-col">
+                    <span class="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">TELEGRAM MINI APP</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-lg">🤖</span>
+                        <div class="flex flex-col">
+                            <span id="menu-tg-username" class="text-xs font-black text-white leading-tight">Mehmon</span>
+                            <span id="menu-tg-id" class="text-[9px] font-mono font-bold text-cyan-400/80">ID: Noma'lum</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                  <span class="px-2.5 py-1 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-xs">SPACE / W</span>
-                  <p class="leading-tight">To'siqlardan sakrash</p>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-xs">💎</span>
-                  <p class="leading-tight"><span class="text-cyan-300 font-semibold">Bonus:</span> Kristall yig'ib reytingni oshiring.</p>
+                <div class="flex flex-col items-end">
+                    <span class="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">UMUMIY BALANS</span>
+                    <span id="menu-crystals-val" class="text-lg font-black text-amber-400 font-mono flex items-center gap-1">💎 0</span>
                 </div>
             </div>
 
-            <button id="start-game-btn" class="w-full py-4 px-6 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 active:scale-95 duration-150 rounded-2xl text-lg font-black text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-3 cursor-pointer">
+            <!-- QAHRAMONLAR DO'KONI (CHARACTERS SHOP) -->
+            <div class="w-full bg-slate-950/90 rounded-2xl border border-slate-800/80 p-3 mb-3 text-center">
+                <span class="text-[8px] text-slate-500 font-black uppercase tracking-widest block mb-2 text-left">QAHRAMONNI TANLASH</span>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <!-- Skin 1: Default -->
+                    <div id="skin-card-default" class="p-2.5 bg-slate-900 border border-slate-700/60 rounded-xl transition duration-150 flex flex-col items-center">
+                        <img src="https://i.ibb.co/S7NmR6dS/1773467803952.png" alt="Asqar 1" class="w-12 h-12 object-cover rounded-xl border border-slate-800/80 mb-1.5" referrerPolicy="no-referrer">
+                        <span class="text-[10px] font-black text-white leading-tight">Asqar 1</span>
+                        <span class="text-[8px] text-slate-500 mb-2 font-medium">Standard</span>
+                        <button id="select-skin-default-btn" class="w-full py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-[9px] font-black text-white rounded-lg uppercase tracking-wider transition-all">Tanlangan</button>
+                    </div>
+                    <!-- Skin 2: Premium (askar2.glb) -->
+                    <div id="skin-card-askar2" class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl transition duration-150 flex flex-col items-center relative">
+                        <span class="absolute top-1 right-2.5 text-[8px] font-black text-amber-400 bg-amber-950/80 border border-amber-800/40 px-1 rounded">10 💎</span>
+                        <img src="https://i.ibb.co/35Wfkw4M/1781433449953.png" alt="Asqar 2" class="w-12 h-12 object-cover rounded-xl border border-slate-800/80 mb-1.5" referrerPolicy="no-referrer">
+                        <span class="text-[10px] font-black text-white leading-tight">Asqar 2 (NEW)</span>
+                        <span class="text-[8px] text-slate-500 mb-2 font-medium">Cyber War</span>
+                        <button id="select-skin-askar2-btn" class="w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-[9px] font-black text-slate-300 rounded-lg uppercase tracking-wider transition-all">Sotib olish</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON Fayl Tuzish & Boshqarish Paneli -->
+            <div class="w-full flex justify-between gap-2.5 mb-3.5">
+                <button id="view-json-btn" class="flex-1 py-2 px-3 bg-slate-950/90 border border-slate-800 hover:bg-slate-900 text-[10px] text-cyan-400 hover:text-cyan-300 rounded-xl font-bold flex items-center justify-center gap-1 transition">
+                    📄 JSON ko'rish
+                </button>
+                <button id="download-json-btn" class="flex-1 py-2 px-3 bg-slate-950/90 border border-slate-800 hover:bg-slate-900 text-[10px] text-emerald-400 hover:text-emerald-300 rounded-xl font-bold flex items-center justify-center gap-1 transition">
+                    📥 JSON Yuklab olish
+                </button>
+            </div>
+
+            <!-- Boshqaruv qo'llanmasi -->
+            <div class="w-full bg-slate-950/90 rounded-2xl border border-slate-800/90 p-3 mb-4 text-left text-[10px] gap-2 flex flex-col text-slate-350">
+                <div class="flex items-center gap-2">
+                  <span class="px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-[9px]">A / D / ← / →</span>
+                  <p class="leading-tight text-slate-400">Chapga / O'ngga burilish (yoki sensor surish)</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-800 font-bold text-cyan-400 text-[9px]">SPACE / W</span>
+                  <p class="leading-tight text-slate-400">To'siqlardan sakrash</p>
+                </div>
+            </div>
+
+            <button id="start-game-btn" class="w-full py-3.5 px-5 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 active:scale-95 duration-100 rounded-2xl text-base font-black text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-3 cursor-pointer">
                 🎮 O'YINNI BOSHLASH
             </button>
+        </div>
+    </div>
+
+    <!-- JSON Fayl Visual Modal Oynasi (O'zi JSON fayl yasash va saqlash) -->
+    <div id="json-modal" class="absolute inset-0 z-40 bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center p-4 hidden">
+        <div class="max-w-md w-full bg-slate-900/95 border border-slate-800 p-5 rounded-3xl shadow-2xl flex flex-col items-center">
+            <div class="flex justify-between items-center w-full mb-3 pb-2 border-b border-slate-800/60">
+                <span class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                    ⚙️ game_data.json fayli
+                </span>
+                <button id="close-json-modal-btn" class="text-slate-400 hover:text-white font-bold text-base px-2 py-1 bg-slate-800/40 rounded-full hover:bg-slate-800 transition">✕</button>
+            </div>
+            <p class="text-[10px] text-slate-400 mb-3 text-left w-full">
+                Telegram ID va o'yin ma'lumotlaringizni o'zida saqlaydigan, mini app tomondan dinamik generatsiya qilinadigan JSON protokoli:
+            </p>
+            <pre id="json-textarea" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800/80 font-mono text-[9px] text-emerald-400 overflow-x-auto text-left whitespace-pre max-h-52 select-all" style="direction: ltr;"></pre>
+            
+            <div class="flex gap-2.5 w-full mt-4">
+                <button id="copy-json-btn" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-[11px] font-black text-white rounded-xl transition">
+                    Nusxalash 📋
+                </button>
+                <button id="edit-json-btn" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-[11px] font-black text-white rounded-xl transition">
+                    Tahrirlash ID ✏️
+                </button>
+            </div>
         </div>
     </div>
 
@@ -147,6 +213,9 @@
 
             <button id="restart-game-btn" class="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 active:scale-95 duration-150 rounded-2xl text-lg font-black text-white shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 cursor-pointer">
                 🔄 QAYTADAN BOSHLASH
+            </button>
+            <button id="go-to-menu-btn" class="w-full mt-3 py-3 px-6 bg-slate-800 hover:bg-slate-700 active:scale-95 duration-150 rounded-2xl text-sm font-bold text-slate-300 hover:text-white flex items-center justify-center gap-2 cursor-pointer transition-all border border-slate-750/30">
+                🏠 BOSH MENYUGA QAYTISH
             </button>
         </div>
     </div>
@@ -279,8 +348,8 @@
         // Dunyo parametrlari va Three.js o'zgaruvchilari
         let scene, camera, renderer, clock;
         let playerGroup, zombieGroup;
-        let soldierTemplate = null, zombieTemplate = null;
-        let soldierAnimations = [], zombieAnimations = [];
+        let soldierTemplate = null, soldier2Template = null, zombieTemplate = null;
+        let soldierAnimations = [], soldier2Animations = [], zombieAnimations = [];
         let mixers = [];
 
         let gameActive = false;
@@ -305,16 +374,125 @@
         const keys = { ArrowLeft: false, ArrowRight: false, KeyA: false, KeyD: false };
 
         const soldierModelUrl = "https://raw.githubusercontent.com/Davron2003/spaceshooter/main/1aae90e8-37b6-4cf2-8567-bbd6aaefe554_gltf_run.glb";
+        const soldier2ModelUrl = "https://raw.githubusercontent.com/Davron2003/zombiewar/main/askar2.glb";
         const zombieModelUrl = "https://raw.githubusercontent.com/Davron2003/spaceshooter/main/zombie.glb";
 
-        // LocalStorage dan yuqori natijani olish
+        // Telegram WebApp Integration and Data Persistence
+        let tgUser = { id: 77777777, username: "mehmon" };
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tgApp = window.Telegram.WebApp;
+                tgApp.ready();
+                if (tgApp.initDataUnsafe && tgApp.initDataUnsafe.user) {
+                    tgUser.id = tgApp.initDataUnsafe.user.id;
+                    tgUser.username = tgApp.initDataUnsafe.user.username || tgApp.initDataUnsafe.user.first_name || "Telegram_User";
+                }
+            }
+        } catch (e) {
+            console.warn("Telegram WebApp not ready/accessible:", e);
+        }
+
+        // Local legacy highscore fallback
         let highScore = Number(localStorage.getItem("zombie_runner_highscore") || "0");
+
+        // Structured JSON persistent game data state
+        let gameSaveData = {
+            telegramId: tgUser.id,
+            telegramUser: tgUser.username,
+            crystals: 0,
+            unlockedSkins: ["default"],
+            selectedSkin: "default",
+            highScore: highScore
+        };
+
+        try {
+            const savedDataString = localStorage.getItem("zombie_runner_json_saved_file");
+            if (savedDataString) {
+                const parsed = JSON.parse(savedDataString);
+                if (parsed) {
+                    gameSaveData = parsed;
+                    // Keep highscores in sync
+                    if (highScore > gameSaveData.highScore) {
+                        gameSaveData.highScore = highScore;
+                    } else if (gameSaveData.highScore > highScore) {
+                        highScore = gameSaveData.highScore;
+                        localStorage.setItem("zombie_runner_highscore", String(highScore));
+                    }
+                }
+            } else {
+                gameSaveData.highScore = highScore;
+                localStorage.setItem("zombie_runner_json_saved_file", JSON.stringify(gameSaveData));
+            }
+        } catch (e) {
+            console.error("JSON gameSaveData loading failed, fallback applied:", e);
+        }
+
+        // Sync with HUD
         document.getElementById("highscore-val").innerText = highScore + " m";
+
+        // Synchronize menu HUD information with gameSaveData
+        function updateMenuUI() {
+            // Update profile labels
+            document.getElementById("menu-tg-id").innerText = "ID: " + gameSaveData.telegramId;
+            document.getElementById("menu-tg-username").innerText = gameSaveData.telegramUser;
+            document.getElementById("menu-crystals-val").innerText = "💎 " + gameSaveData.crystals;
+
+            // Render shopping selections
+            const defaultBtn = document.getElementById("select-skin-default-btn");
+            const askar2Btn = document.getElementById("select-skin-askar2-btn");
+            const defaultCard = document.getElementById("skin-card-default");
+            const askar2Card = document.getElementById("skin-card-askar2");
+
+            // Reset classes
+            defaultCard.className = "p-2.5 bg-slate-900 border border-slate-700/60 rounded-xl transition duration-150 flex flex-col items-center";
+            askar2Card.className = "p-2.5 bg-slate-900 border border-slate-800 rounded-xl transition duration-150 flex flex-col items-center relative";
+
+            if (gameSaveData.selectedSkin === "default") {
+                defaultCard.className += " border-emerald-500 bg-slate-900/90 shadow-lg shadow-emerald-500/10";
+                defaultBtn.innerText = "Tanlangan";
+                defaultBtn.className = "w-full py-1.5 px-2 bg-emerald-600 text-[9px] font-black text-white rounded-lg uppercase tracking-wider transition-all";
+            } else {
+                defaultBtn.innerText = "Tanlash";
+                defaultBtn.className = "w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-[9px] font-black text-slate-300 rounded-lg uppercase tracking-wider transition-all";
+            }
+
+            // Auto-unlock askar2 if user has >= 10 crystals
+            if (gameSaveData.crystals >= 10 && !gameSaveData.unlockedSkins.includes("askar2")) {
+                gameSaveData.unlockedSkins.push("askar2");
+                saveAndSyncData();
+                return; // saveAndSyncData will re-trigger updateMenuUI
+            }
+
+            if (gameSaveData.unlockedSkins.includes("askar2")) {
+                if (gameSaveData.selectedSkin === "askar2") {
+                    askar2Card.className += " border-amber-500 bg-slate-900/90 shadow-lg shadow-amber-500/10";
+                    askar2Btn.innerText = "Tanlangan";
+                    askar2Btn.className = "w-full py-1.5 px-2 bg-amber-600 text-[9px] font-black text-white rounded-lg uppercase tracking-wider transition-all";
+                } else {
+                    askar2Btn.innerText = "Tanlash";
+                    askar2Btn.className = "w-full py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-[9px] font-black text-slate-300 rounded-lg uppercase tracking-wider transition-all";
+                }
+            } else {
+                // Not unlocked yet and doesn't have 10 crystals
+                askar2Btn.innerText = "Sotib olish (10 💎)";
+                askar2Btn.className = "w-full py-1.5 px-2 bg-amber-600/20 hover:bg-amber-600/35 text-amber-500 border border-amber-500/30 text-[9px] font-black rounded-lg uppercase tracking-wider transition-all";
+            }
+
+            // Sync structured visual file string
+            document.getElementById("json-textarea").innerText = JSON.stringify(gameSaveData, null, 4);
+        }
+
+        // Centralized storage helper
+        function saveAndSyncData() {
+            localStorage.setItem("zombie_runner_json_saved_file", JSON.stringify(gameSaveData));
+            updateMenuUI();
+        }
 
         // Yuklanish jarayoni va start funksiyalarini tayyorlash
         window.addEventListener("DOMContentLoaded", () => {
             initEngine();
             setupInteractions();
+            updateMenuUI();
         });
 
         // 1. Zaxira sodda 3D modellar if loading drops
@@ -334,7 +512,6 @@
             return group;
         }
 
-        // Zombi zaxirasi
         function createFallbackZombie() {
             const group = new THREE.Group();
             const body = new THREE.Mesh(
@@ -410,8 +587,8 @@
 
             // 1. Askar
             try {
-                loadingTxt.innerText = "Askar modeli o'rnatilmoqda...";
-                loadingBar.style.width = "40%";
+                loadingTxt.innerText = "Birinchi askar modeli o'rnatilmoqda...";
+                loadingBar.style.width = "30%";
                 const gltfS = await loader.loadAsync(soldierModelUrl);
                 soldierTemplate = gltfS.scene;
                 soldierAnimations = gltfS.animations;
@@ -419,10 +596,21 @@
                 console.warn("Askar modelini yuklashda xatolik, zaxira block ishladi:", err);
             }
 
+            // 1b. Askar 2
+            try {
+                loadingTxt.innerText = "Ikkinchi askar (Cyber War) yuklanmoqda...";
+                loadingBar.style.width = "60%";
+                const gltfS2 = await loader.loadAsync(soldier2ModelUrl);
+                soldier2Template = gltfS2.scene;
+                soldier2Animations = gltfS2.animations;
+            } catch (err) {
+                console.warn("Askar 2 modelini yuklashda xatolik:", err);
+            }
+
             // 2. Zombi (Kiritilgan glb zombi modeli)
             try {
                 loadingTxt.innerText = "Zombi modeli integratsiya qilinmoqda...";
-                loadingBar.style.width = "80%";
+                loadingBar.style.width = "85%";
                 const gltfZ = await loader.loadAsync(zombieModelUrl);
                 zombieTemplate = gltfZ.scene;
                 zombieAnimations = gltfZ.animations;
@@ -447,10 +635,14 @@
             while (zombieGroup.children.length > 0) zombieGroup.remove(zombieGroup.children[0]);
             mixers = [];
 
+            // Active model tanlash
+            let activeTemplate = (gameSaveData.selectedSkin === "askar2" && soldier2Template) ? soldier2Template : soldierTemplate;
+            let activeAnimations = (gameSaveData.selectedSkin === "askar2" && soldier2Template) ? soldier2Animations : soldierAnimations;
+
             // Player mesh
             let sMesh;
-            if (soldierTemplate) {
-                sMesh = THREE.SkeletonUtils.clone(soldierTemplate);
+            if (activeTemplate) {
+                sMesh = THREE.SkeletonUtils.clone(activeTemplate);
                 sMesh.rotation.y = Math.PI / 2; // Oldinga/tugri qarab yuguradi!
                 // O'lchamini normallashtirish
                 const box = new THREE.Box3().setFromObject(sMesh);
@@ -459,9 +651,10 @@
                 const scale = 1.82 / (size.y || 1);
                 sMesh.scale.set(scale, scale, scale);
 
-                if (soldierAnimations && soldierAnimations.length > 0) {
+                if (activeAnimations && activeAnimations.length > 0) {
                     const mix = new THREE.AnimationMixer(sMesh);
-                    mix.clipAction(soldierAnimations[0]).play();
+                    // play birinchi animatsiya (yugurish/harakatlanish)
+                    mix.clipAction(activeAnimations[0]).play();
                     mixers.push(mix);
                 }
             } else {
@@ -483,7 +676,7 @@
 
                 if (zombieAnimations && zombieAnimations.length > 0) {
                     const mix = new THREE.AnimationMixer(zMesh);
-                    // Birinchi run/walk animatsiyasini ishga tushuramiz
+                    // Birinchi run/walk animatsiyasini ishga tushiramiz
                     mix.clipAction(zombieAnimations[0]).play();
                     mixers.push(mix);
                 }
@@ -658,6 +851,82 @@
 
         // 3. UI, Tugma va Interaktiv bog'lash
         function setupInteractions() {
+            // Skin 1 (Default) tanlash
+            document.getElementById("select-skin-default-btn").addEventListener("click", () => {
+                gameSaveData.selectedSkin = "default";
+                saveAndSyncData();
+                createActors();
+                soundFX.playScore();
+            });
+
+            // Skin 2 (Asqar 2 / premium) sotib olish yoki tanlash
+            document.getElementById("select-skin-askar2-btn").addEventListener("click", () => {
+                if (gameSaveData.unlockedSkins.includes("askar2")) {
+                    gameSaveData.selectedSkin = "askar2";
+                    saveAndSyncData();
+                    createActors();
+                    soundFX.playScore();
+                } else {
+                    // Purchase flow
+                    if (gameSaveData.crystals >= 10) {
+                        gameSaveData.crystals -= 10;
+                        gameSaveData.unlockedSkins.push("askar2");
+                        gameSaveData.selectedSkin = "askar2";
+                        saveAndSyncData();
+                        createActors();
+                        soundFX.playScore();
+                        alert("Muvaffaqiyatli xarid qilindi! 🎉 Asqar 2 (Cyber War) faollashtirildi.");
+                    } else {
+                        alert("Sotib olish uchun 10 ta kristal kerak! Reklama tomosha qilish yoki o'yin davomida yig'ing (Hozirgi balansingiz: " + gameSaveData.crystals + " 💎)");
+                    }
+                }
+            });
+
+            // JSON Faylni ko'rish modalini ochish
+            document.getElementById("view-json-btn").addEventListener("click", () => {
+                document.getElementById("json-modal").classList.remove("hidden");
+                document.getElementById("json-textarea").innerText = JSON.stringify(gameSaveData, null, 4);
+            });
+
+            // JSON modalini yopish
+            document.getElementById("close-json-modal-btn").addEventListener("click", () => {
+                document.getElementById("json-modal").classList.add("hidden");
+            });
+
+            // JSON faylni kompyuter/telefonga yuklab olish (.json)
+            document.getElementById("download-json-btn").addEventListener("click", () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameSaveData, null, 4));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "game_data.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                soundFX.playScore();
+            });
+
+            // JSON matnini nusxalash
+            document.getElementById("copy-json-btn").addEventListener("click", () => {
+                const text = document.getElementById("json-textarea").innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = document.getElementById("copy-json-btn");
+                    const prev = btn.innerText;
+                    btn.innerText = "Nusxalandi! ✓";
+                    setTimeout(() => btn.innerText = prev, 1500);
+                }).catch(err => {
+                    alert("Nusxalashda xatolik yuz berdi.");
+                });
+            });
+
+            // Telegram profil parametrlarini tahrirlash (Simulyatsiya)
+            document.getElementById("edit-json-btn").addEventListener("click", () => {
+                const newId = prompt("Telegram ID ni kiriting:", gameSaveData.telegramId);
+                const newUsername = prompt("Telegram Username kiriting (masalan, @Davron2003):", gameSaveData.telegramUser);
+                if (newId !== null) gameSaveData.telegramId = Number(newId) || gameSaveData.telegramId;
+                if (newUsername !== null && newUsername.trim() !== "") gameSaveData.telegramUser = newUsername.trim();
+                saveAndSyncData();
+            });
+
             // O'yinni boshlash tugmasi
             document.getElementById("start-game-btn").addEventListener("click", () => {
                 document.getElementById("menu-screen").classList.add("hidden");
@@ -668,6 +937,13 @@
             document.getElementById("restart-game-btn").addEventListener("click", () => {
                 document.getElementById("gameover-screen").classList.add("hidden");
                 startGame();
+            });
+
+            // Bosh menyuga qaytish tugmasi
+            document.getElementById("go-to-menu-btn").addEventListener("click", () => {
+                document.getElementById("gameover-screen").classList.add("hidden");
+                document.getElementById("menu-screen").classList.remove("hidden");
+                updateMenuUI();
             });
 
             // Ovoz sozlagichi
@@ -695,6 +971,7 @@
                 const deltaY = t.clientY - touchStartY;
 
                 // Chap/O'ng sensor surilishi (Dinamik drag boshqaruv)
+                // Sezgirlik mobil telefonda o'yinchi barmoq harakatiga to'la va silliq bog'lanadi
                 const sensitivity = 0.035;
                 let newLaneX = touchStartLaneX + deltaX * sensitivity;
                 currentLaneX = Math.max(-bridgeWidth / 2 + 1.2, Math.min(bridgeWidth / 2 - 1.2, newLaneX));
@@ -750,6 +1027,7 @@
             playerGroup.position.set(0, 0, 0);
             zombieGroup.position.set(0, 0, 6.2); // Zombie har doim ortida yugurishni boshlaydi
 
+            createActors(); // Tanlangan qahramon modelini yuklaydi
             spawnAllObstacles();
             clock.getDelta(); // reset clock trigger
         }
@@ -758,6 +1036,13 @@
         function handleGameOver() {
             gameActive = false;
             soundFX.playGameOver();
+
+            // Kristallarni va rekordi doimiy saqlash (JSON fayl)
+            gameSaveData.crystals += coinsCollected;
+            if (distanceCount > gameSaveData.highScore) {
+                gameSaveData.highScore = distanceCount;
+            }
+            saveAndSyncData();
 
             document.getElementById("final-score").innerText = distanceCount + " m";
             if (distanceCount > highScore) {
@@ -776,10 +1061,14 @@
                 AdController.show()
                     .then((result) => {
                         console.log("Reklama ko'rsatildi yoki yopildi:", result);
-                        // Kristallarga +10 bonus qo'shish
+                        // Kristallarga +10 bonus qo'shish (HUD o'yin maydonida)
                         coinsCollected += 10;
                         document.getElementById("coins-val").innerText = "💎 " + coinsCollected;
                         
+                        // Doimiy saqlashga ham +10 qo'shish
+                        gameSaveData.crystals += 10;
+                        saveAndSyncData();
+
                         // Vizual effekt va o'yin tugash oynasini ochish
                         createExplosionEffect(0x10b981, new THREE.Vector3(playerGroup.position.x, 2, playerGroup.position.z));
                         document.getElementById("gameover-screen").classList.remove("hidden");
@@ -816,7 +1105,8 @@
                 // Silliq harakat taminlash (Lerping player's track positions)
                 playerGroup.position.x += (currentLaneX - playerGroup.position.x) * 0.25;
 
-                // 2. ZOMBI ASKAR ORTIDAN YUGURISHI LOGIKASI
+                // 2. ZOMBI ASKAR ORTIDAN YUGURISHI LOGIKASI ("zombie mening orqamdan yugirishi kerak")
+                // Zombi chap yo o'ngga burilishini askarga moslashtirib silliq (lerp) tarzda quvib boradi
                 zombieGroup.position.x += (playerGroup.position.x - zombieGroup.position.x) * 0.12;
 
                 // Dinamik silkinib/qushilib borgan daxshatli nafas/quvlash masofasi
@@ -957,4 +1247,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
